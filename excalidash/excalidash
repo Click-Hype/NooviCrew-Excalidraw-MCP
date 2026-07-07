@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Wrapper da CLI do Excalidash p/ agentes com terminal (ex.: Aria/Hermes).
+# Carrega credenciais de fora do git e chama a CLI Node. Uso: ./excalidash <cmd> [args]
+set -euo pipefail
+CREDS="${EXCALIDASH_ENV:-/home/debian/docker/stacks/excalidash/aria.env}"
+[ -f "$CREDS" ] && . "$CREDS"
+exec node "$(cd "$(dirname "$0")" && pwd)/cli.mjs" "$@"
