@@ -5,7 +5,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { Excalidash, buildPresentation, APPSTATE } from "./lib.mjs";
+import { Excalidash, buildPresentation, APPSTATE, boxElements, textElements, arrowElements, stickyElements } from "./lib.mjs";
 
 const client = new Excalidash();
 
@@ -46,7 +46,18 @@ const TOOLS = [
       required: ["title", "stages"],
     },
   },
-  { name: "write_scene", description: "Escreve elementos Excalidraw crus em um canvas (escape hatch para layout custom).", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, elements: { type: "array" } }, required: ["drawingId", "elements"] } },
+  { name: "write_scene", description: "Substitui a cena de um canvas por elementos Excalidraw crus (escape hatch para layout custom).", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, elements: { type: "array" } }, required: ["drawingId", "elements"] } },
+  // organização (seguro; sem delete)
+  { name: "move_canvas", description: "Move um canvas para uma pasta (folderId null = tira da pasta).", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, folderId: { type: ["string", "null"] } }, required: ["drawingId"] } },
+  { name: "rename_canvas", description: "Renomeia um canvas.", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, name: { type: "string" } }, required: ["drawingId", "name"] } },
+  { name: "move_folder", description: "Move uma pasta para dentro de outra (parentId null = raiz). Anti-ciclo no backend.", inputSchema: { type: "object", properties: { folderId: { type: "string" }, parentId: { type: ["string", "null"] } }, required: ["folderId"] } },
+  { name: "rename_folder", description: "Renomeia uma pasta.", inputSchema: { type: "object", properties: { folderId: { type: "string" }, name: { type: "string" } }, required: ["folderId", "name"] } },
+  { name: "share_canvas", description: "Compartilha um canvas com uma pessoa pelo e-mail (permission view|edit). A pessoa precisa ter conta.", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, email: { type: "string" }, permission: { type: "string", enum: ["view", "edit"] } }, required: ["drawingId", "email"] } },
+  // desenho livre (acrescenta elementos SEM apagar os existentes)
+  { name: "add_box", description: "Acrescenta uma caixa rotulada ao canvas. color: blue|green|red|yellow|purple|gray.", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, width: { type: "number" }, height: { type: "number" }, label: { type: "string" }, color: { type: "string" } }, required: ["drawingId", "x", "y"] } },
+  { name: "add_text", description: "Acrescenta um texto ao canvas.", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, text: { type: "string" }, fontSize: { type: "number" } }, required: ["drawingId", "x", "y", "text"] } },
+  { name: "add_arrow", description: "Acrescenta uma seta entre dois pontos.", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" } }, required: ["drawingId", "x1", "y1", "x2", "y2"] } },
+  { name: "add_sticky", description: "Acrescenta um sticky note (bilhete amarelo) ao canvas.", inputSchema: { type: "object", properties: { drawingId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, text: { type: "string" } }, required: ["drawingId", "x", "y", "text"] } },
 ];
 
 const server = new Server({ name: "excalidash", version: "1.0.0" }, { capabilities: { tools: {} } });
@@ -72,6 +83,15 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
         return ok({ ...res, elementsCount: elements.length });
       }
       case "write_scene": { return ok(await client.updateDrawing(a.drawingId, { elements: a.elements })); }
+      case "move_canvas": { return ok(await client.updateDrawing(a.drawingId, { collectionId: a.folderId ?? null })); }
+      case "rename_canvas": { return ok(await client.updateDrawing(a.drawingId, { name: a.name })); }
+      case "move_folder": { return ok(await client.updateCollection(a.folderId, { parentId: a.parentId ?? null })); }
+      case "rename_folder": { return ok(await client.updateCollection(a.folderId, { name: a.name })); }
+      case "share_canvas": { return ok(await client.shareDrawing(a.drawingId, a.email, a.permission || "view")); }
+      case "add_box": { return ok(await client.appendElements(a.drawingId, boxElements(a.x, a.y, a.width, a.height, a.label, a.color))); }
+      case "add_text": { return ok(await client.appendElements(a.drawingId, textElements(a.x, a.y, a.text, { fontSize: a.fontSize }))); }
+      case "add_arrow": { return ok(await client.appendElements(a.drawingId, arrowElements(a.x1, a.y1, a.x2, a.y2))); }
+      case "add_sticky": { return ok(await client.appendElements(a.drawingId, stickyElements(a.x, a.y, a.text))); }
       default: return { content: [{ type: "text", text: `Tool desconhecida: ${name}` }], isError: true };
     }
   } catch (e) {

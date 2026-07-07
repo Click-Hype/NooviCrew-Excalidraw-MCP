@@ -10,7 +10,7 @@
 //   render <folderId|-> <json|@arquivo>   -> render_presentation (spec JSON no stdin/arquivo/arg)
 // Env: EXCALIDASH_URL, EXCALIDASH_EMAIL, EXCALIDASH_PASSWORD.
 import fs from "node:fs";
-import { Excalidash, buildPresentation, APPSTATE } from "./lib.mjs";
+import { Excalidash, buildPresentation, APPSTATE, boxElements, textElements, arrowElements, stickyElements } from "./lib.mjs";
 
 const [cmd, ...args] = process.argv.slice(2);
 const c = new Excalidash();
@@ -39,6 +39,16 @@ try {
     case "canvases": out(await c.listDrawings(args[0])); break;
     case "create-canvas": out(await c.createDrawing({ name: args[0], collectionId: args[1] })); break;
     case "get-canvas": out(await c.getDrawing(args[0])); break;
+    case "move-canvas": out(await c.updateDrawing(args[0], { collectionId: args[1] || null })); break;
+    case "rename-canvas": out(await c.updateDrawing(args[0], { name: args.slice(1).join(" ") })); break;
+    case "move-folder": out(await c.updateCollection(args[0], { parentId: args[1] || null })); break;
+    case "rename-folder": out(await c.updateCollection(args[0], { name: args.slice(1).join(" ") })); break;
+    case "share": out(await c.shareDrawing(args[0], args[1], args[2] || "view")); break;
+    case "write-scene": out(await c.updateDrawing(args[0], { elements: readSpec(args[1]) })); break;
+    case "add-box": out(await c.appendElements(args[0], boxElements(+args[1], +args[2], +args[3] || 220, +args[4] || 90, args[5] || "", args[6] || "blue"))); break;
+    case "add-text": out(await c.appendElements(args[0], textElements(+args[1], +args[2], args.slice(3).join(" ")))); break;
+    case "add-arrow": out(await c.appendElements(args[0], arrowElements(+args[1], +args[2], +args[3], +args[4]))); break;
+    case "add-sticky": out(await c.appendElements(args[0], stickyElements(+args[1], +args[2], args.slice(3).join(" ")))); break;
     case "render": {
       const folderId = args[0] && args[0] !== "-" ? args[0] : undefined;
       const spec = readSpec(args[1]);
@@ -50,7 +60,16 @@ try {
       break;
     }
     default:
-      out("cmds: whoami | folders | create-folder <nome> [parentId] | canvases [folderId] | create-canvas <nome> [folderId] | get-canvas <id> | render <folderId|-> <@spec.json>");
+      out([
+        "cmds:",
+        "  whoami | folders | canvases [folderId]",
+        "  create-folder <nome> [parentId] | rename-folder <id> <nome> | move-folder <id> [parentId]",
+        "  create-canvas <nome> [folderId] | get-canvas <id> | rename-canvas <id> <nome> | move-canvas <id> [folderId]",
+        "  share <drawingId> <email> [view|edit]",
+        "  render <folderId|-> <@spec.json> | write-scene <id> <@elements.json>",
+        "  add-box <id> <x> <y> [w] [h] [label] [color] | add-text <id> <x> <y> <texto>",
+        "  add-arrow <id> <x1> <y1> <x2> <y2> | add-sticky <id> <x> <y> <texto>",
+      ].join("\n"));
   }
 } catch (e) {
   console.error("ERRO:", e.message);

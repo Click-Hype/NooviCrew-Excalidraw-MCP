@@ -119,6 +119,32 @@ export class Excalidash {
     return { id: d.id, name: d.name, url: `${this.url}/editor/${d.id}` };
   }
 
+  // Renomeia/move uma pasta (parentId=null tira do aninhamento). Anti-ciclo é validado no backend.
+  async updateCollection(id, { name, parentId } = {}) {
+    const body = {};
+    if (name !== undefined) body.name = name;
+    if (parentId !== undefined) body.parentId = parentId;
+    return this._write("PUT", `/api/collections/${id}`, body);
+  }
+
+  // Compartilha um canvas com uma pessoa pelo e-mail (permission: "view" | "edit").
+  async shareDrawing(drawingId, email, permission = "view") {
+    const matches = await this._get(`/api/drawings/${drawingId}/share-resolve?q=${encodeURIComponent(email)}`);
+    const list = Array.isArray(matches) ? matches : matches.users || [];
+    const user = list.find((u) => (u.email || "").toLowerCase() === email.toLowerCase()) || list[0];
+    if (!user) throw new Error(`usuário não encontrado para "${email}" (precisa ter conta no Excalidash)`);
+    await this._write("POST", `/api/drawings/${drawingId}/permissions`, { granteeUserId: user.id, permission });
+    return { drawingId, sharedWith: user.email, permission };
+  }
+
+  // Acrescenta elementos a um canvas SEM apagar os existentes (get + concat + put).
+  async appendElements(drawingId, newElements) {
+    const cur = await this.getDrawing(drawingId);
+    const elements = [...(Array.isArray(cur.elements) ? cur.elements : []), ...newElements];
+    await this.updateDrawing(drawingId, { elements });
+    return { id: drawingId, added: newElements.length, total: elements.length, url: cur.url };
+  }
+
   // Garante uma coleção pelo nome (cria se não existir) — organização por projeto/cliente
   async ensureCollection(name) {
     const cols = await this.listCollections();
@@ -274,6 +300,32 @@ export function buildPresentation({ title, subtitle, stages = [], pending = [], 
   }
 
   return els;
+}
+
+// ---- Builders de desenho livre (retornam array de elementos p/ appendElements) ----
+const COLORS = {
+  blue: { bg: "#e7f0ff", stroke: "#3b6fd4" }, green: { bg: "#e6f7ec", stroke: "#2f9e51" },
+  red: { bg: "#fdecef", stroke: "#d1435b" }, yellow: { bg: "#fff6d6", stroke: "#e0b83a" },
+  purple: { bg: "#f2effc", stroke: "#7b61c9" }, gray: { bg: "#f1f3f5", stroke: "#868e96" },
+};
+/** Caixa rotulada (retângulo + texto centralizado). color: blue|green|red|yellow|purple|gray */
+export function boxElements(x, y, w = 220, h = 90, label = "", color = "blue") {
+  const c = COLORS[color] || COLORS.blue;
+  const els = [rect(x, y, w, h, { bg: c.bg, stroke: c.stroke })];
+  if (label) els.push(text(x + 12, y + Math.max(10, h / 2 - 12), label, { fontSize: 15, color: c.stroke, bold: true, maxWidth: w - 24 }));
+  return els;
+}
+/** Texto solto. */
+export function textElements(x, y, str, { fontSize = 16, color = PALETTE.ink, maxWidth = 500 } = {}) {
+  return [text(x, y, str, { fontSize, color, maxWidth })];
+}
+/** Seta entre dois pontos. */
+export function arrowElements(x1, y1, x2, y2) {
+  return [arrow(x1, y1, x2, y2)];
+}
+/** Sticky note (bilhete amarelo com texto). */
+export function stickyElements(x, y, str, w = 220, h = 120) {
+  return [rect(x, y, w, h, { bg: PALETTE.noteBg, stroke: PALETTE.noteStroke }), text(x + 12, y + 12, str, { fontSize: 13, color: PALETTE.ink, maxWidth: w - 24 })];
 }
 
 export const APPSTATE = { viewBackgroundColor: "#ffffff", gridSize: null };
