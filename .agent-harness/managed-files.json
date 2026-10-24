@@ -1,0 +1,28 @@
+{
+  "format": 1,
+  "template_version": "1.0.0",
+  "repository": "Click-Hype/NooviCrew-Excalidraw-MCP",
+  "files": {
+    ".agent-harness/WORKFLOW.md": "16320aa3408a154439bb465b858c7875f591556a4d7a7c452ae993b67cd92586",
+    ".agent-harness/agents/noovicrew-shared-implementer.md": "755c9f6c06bb7e300f08bfb24fcd7da38a582784c0c90e4f289475a62487ac0d",
+    ".agent-harness/agents/noovicrew-shared-planner.md": "4a9ef4253c48af1e01975cb437b8bdbd2fe0f5fe16a12fafd3a6e0e3eac19633",
+    ".agent-harness/agents/noovicrew-shared-security-reviewer.md": "5638d60b8359a96ed6281945c6c3b41b11b20c28a503a84a8d5047f38fb89bad",
+    ".agent-harness/agents/noovicrew-shared-verifier.md": "962ac1b4d75de7fdf7ee9d0e2e8e0ba8b1704a71b0c71c940e96e9033858bb4b",
+    ".agent-harness/config.json": "1c860fcd2d81b13607514efa352fe656e821164347e10b13614614bd331779a3",
+    ".agent-harness/hooks/session-start.sh": "ca5d177879a81f08b03512bc1fe41b61386cca2664cb64b51578fd1abc563c88",
+    ".agents/rules/noovicrew-shared-harness.md": "dcd54a3c3056d2f2db0d5fce73bb0545523d114f59a620895c5bbc4ba88daaad",
+    ".agents/skills/noovicrew-shared-harness/SKILL.md": "271fb09a2b577ab69d205c56be1bb862596c506ceb06d660d41a7ace1fc7fa42",
+    ".claude/agents/noovicrew-shared-implementer.md": "752a960f9a19f8b9fa5e78471a9f59a8f3c415a1263ee27eddb87fee09b8fc79",
+    ".claude/agents/noovicrew-shared-planner.md": "30fae48a7689e5407dade871bd99b16aa20d9ce6d44e1e658581af8e3aed0f5f",
+    ".claude/agents/noovicrew-shared-security-reviewer.md": "48792c459bf0a4c686c51e1b5dc795eed3ac4ad0a92a7da40a7ee99deecf2fe9",
+    ".claude/agents/noovicrew-shared-verifier.md": "8d8c08d9fb9363047b4d83f74f1d1fb28a236b2673354c8d48816cf8b6a15872",
+    ".claude/commands/noovicrew-shared-harness.md": "5c871c03b2f9764ddbc0f8379707efef228971dfff3412ddd952d452b74d296f",
+    ".claude/skills/noovicrew-shared-harness/SKILL.md": "271fb09a2b577ab69d205c56be1bb862596c506ceb06d660d41a7ace1fc7fa42",
+    ".cursor/agents/noovicrew-shared-implementer.md": "752a960f9a19f8b9fa5e78471a9f59a8f3c415a1263ee27eddb87fee09b8fc79",
+    ".cursor/agents/noovicrew-shared-planner.md": "30fae48a7689e5407dade871bd99b16aa20d9ce6d44e1e658581af8e3aed0f5f",
+    ".cursor/agents/noovicrew-shared-security-reviewer.md": "48792c459bf0a4c686c51e1b5dc795eed3ac4ad0a92a7da40a7ee99deecf2fe9",
+    ".cursor/agents/noovicrew-shared-verifier.md": "8d8c08d9fb9363047b4d83f74f1d1fb28a236b2673354c8d48816cf8b6a15872",
+    ".cursor/rules/noovicrew-shared-harness.mdc": "74b7e7a6229645f9a572bb716cf13f3181ce6a95e520ee837de3fc21c37f89c0",
+    ".cursor/skills/noovicrew-shared-harness/SKILL.md": "271fb09a2b577ab69d205c56be1bb862596c506ceb06d660d41a7ace1fc7fa42"
+  }
+}

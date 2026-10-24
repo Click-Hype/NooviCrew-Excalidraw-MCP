@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "template_version": "1.0.0",
+  "repository": "Click-Hype/NooviCrew-Excalidraw-MCP",
+  "base_branch": "main",
+  "main_checkout": ".",
+  "parallel_writers": false,
+  "headless_enabled": false,
+  "auto_merge": false,
+  "auto_deploy": false,
+  "checks": [],
+  "checks_source": "Discover the existing project manifests and approved scripts before running checks."
+}
