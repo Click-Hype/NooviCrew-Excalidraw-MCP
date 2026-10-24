@@ -1,0 +1,1 @@
+Leia AGENTS.md, CLAUDE.md e .agent-harness/WORKFLOW.md. Confirme a tarefa autorizada e seus critérios de aceite; coordene os papéis compartilhados em contextos separados, preservando o processo existente. Não inicie um loop, merge ou deploy por esta instrução.

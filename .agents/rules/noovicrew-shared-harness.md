@@ -1,0 +1,1 @@
+Leia AGENTS.md, CLAUDE.md e .agent-harness/WORKFLOW.md. Preserve as regras específicas do projeto. Uma tarefa autorizada, um escritor e verificador independente; revisão de segurança quando aplicável. Esta base não ativa automações.
